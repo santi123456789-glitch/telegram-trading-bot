@@ -1,26 +1,23 @@
+import os
+import time
 import telebot
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-import random
+import requests
 
-TOKEN = "PEGÁ_ACÁ_TU_TOKEN"
-bot = telebot.TeleBot(TOKEN)
+BOT_TOKEN = os.getenv("TELEGRAM_TOKEN")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+bot = telebot.TeleBot(BOT_TOKEN)
 
-monedas = ["EUR/USD", "BTC/USD", "USD/JPY"]
-
-def generar_senal():
-    return random.choice(["📈 BUY (Compra)", "📉 SELL (Venta)"])
+def obtener_senal_fake():
+    # Simulación de una señal aleatoria (en producción, reemplazar con señales reales)
+    import random
+    return random.choice(["📈 Señal: BUY (Compra)", "📉 Señal: SELL (Venta)", "❌ No hay señal clara"])
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    markup = InlineKeyboardMarkup()
-    for m in monedas:
-        markup.add(InlineKeyboardButton(m, callback_data=m))
-    bot.send_message(message.chat.id, "Elegí una moneda 👇", reply_markup=markup)
-
-@bot.callback_query_handler(func=lambda call: True)
-def handle_query(call):
-    senal = generar_senal()
-    bot.send_message(call.message.chat.id, f"📊 Señal para {call.data}:
-{senal}")
+    bot.send_message(message.chat.id, "✅ Bot iniciado. Enviando señales cada 5 segundos...")
+    while True:
+        senal = obtener_senal_fake()
+        bot.send_message(message.chat.id, senal)
+        time.sleep(5)
 
 bot.polling()
